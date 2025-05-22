@@ -1,9 +1,44 @@
 // Components/UploadForm.jsx
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
+import VanillaTilt from 'vanilla-tilt';
 
 function UploadForm({ onSubmit, isLoading }) {
   const [image, setImage] = useState(null);
   const [previewUrl, setPreviewUrl] = useState('');
+  const formRef = useRef(null);
+  const previewRef = useRef(null);
+    // Initialize tilt effect
+  useEffect(() => {
+    if (formRef.current) {
+      VanillaTilt.init(formRef.current, {
+        max: 5,
+        speed: 400,
+        glare: true,
+        'max-glare': 0.2,
+      });
+    }
+    
+    // Add tilt effect to image preview when it exists
+    if (previewRef.current && previewUrl) {
+      VanillaTilt.init(previewRef.current, {
+        max: 15,
+        speed: 300,
+        glare: true,
+        'max-glare': 0.5,
+        scale: 1.05
+      });
+    }
+    
+    // Clean up tilt effect when component unmounts
+    return () => {
+      if (formRef.current && formRef.current.vanillaTilt) {
+        formRef.current.vanillaTilt.destroy();
+      }
+      if (previewRef.current && previewRef.current.vanillaTilt) {
+        previewRef.current.vanillaTilt.destroy();
+      }
+    };
+  }, [previewUrl]);
 
   const handleImageChange = (e) => {
     const file = e.target.files[0];
@@ -25,10 +60,8 @@ function UploadForm({ onSubmit, isLoading }) {
     } else {
       alert('Please select an image first');
     }
-  };
-
-  return (
-    <div className="upload-form">
+  };  return (
+    <div className="upload-form" ref={formRef}>
       <h2>Upload an Image</h2>
       <form onSubmit={handleSubmit}>
         <div className="file-input-container">
@@ -45,7 +78,7 @@ function UploadForm({ onSubmit, isLoading }) {
         </div>
 
         {previewUrl && (
-          <div className="image-preview">
+          <div className="image-preview" ref={previewRef}>
             <img src={previewUrl} alt="Preview" />
           </div>
         )}

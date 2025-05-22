@@ -1,0 +1,4 @@
+# Ignore environment and uploads
+backend/uploads/
+backend/.env
+node_modules/

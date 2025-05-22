@@ -32,6 +32,7 @@ function StoryResult({ story, audioUrl }) {
   
   useEffect(() => {
     if (audioUrl) {
+      console.log('Audio URL received:', audioUrl);
       setAudioLoading(true);
       setAudioError(false);
     }
@@ -113,6 +114,7 @@ function StoryResult({ story, audioUrl }) {
   }, [story]);
 
   const handleAudioReady = () => {
+    console.log('Audio is ready to play');
     setAudioLoading(false);
     // Auto-play audio when available
     if (audioRef.current && audioUrl) {
@@ -122,7 +124,12 @@ function StoryResult({ story, audioUrl }) {
     }
   };
 
-  const handleAudioError = () => {
+  const handleAudioError = (e) => {
+    console.error('Audio error:', e);
+    console.error('Audio error details:', {
+      audioUrl,
+      errorCode: e.target ? e.target.error : 'No error code available',
+    });
     setAudioError(true);
     setAudioLoading(false);
   };
@@ -137,7 +144,11 @@ function StoryResult({ story, audioUrl }) {
       
       <div className="story-content">
         {story ? (
-          <p className={isTyping ? 'typing' : 'decoded'}>{displayedText || story}</p>
+          <>
+            <p>Generated Story:</p>
+            <p className={isTyping ? 'typing' : 'decoded'}>{story}</p>
+            <p><small>Original story response length: {story ? story.length : 0} characters</small></p>
+          </>
         ) : (
           <p className="loading-text">Generating your story...</p>
         )}

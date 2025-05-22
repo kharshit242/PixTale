@@ -60,7 +60,21 @@ function UploadForm({ onSubmit, isLoading }) {
     } else {
       alert('Please select an image first');
     }
-  };  return (
+  };  const handleTestUpload = async (e) => {
+    e.preventDefault();
+    if (image) {
+      try {
+        const result = await apiService.testImageUpload(image);
+        alert(`Test upload successful! File saved as: ${result.file.filename}`);
+      } catch (error) {
+        alert(`Test upload failed: ${error.message}`);
+      }
+    } else {
+      alert('Please select an image first');
+    }
+  };
+  
+  return (
     <div className="upload-form" ref={formRef}>
       <h2>Upload an Image</h2>
       <form onSubmit={handleSubmit}>

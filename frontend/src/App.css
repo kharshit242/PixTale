@@ -126,43 +126,114 @@
 
 /* Story Result */
 .story-result {
-  background-color: #ffffff;
+  background-color: #2d3748; /* Darker background for white text */
   padding: 2rem;
-  border-radius: 8px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  border-radius: 12px;
+  box-shadow: 
+    0 12px 20px rgba(0, 0, 0, 0.2),
+    0 4px 8px rgba(0, 0, 0, 0.1);
   width: 100%;
   max-width: 800px;
   margin: 0 auto;
+  transform-style: preserve-3d;
+  perspective: 1000px;
+  border: 1px solid rgba(107, 70, 193, 0.2);
+  transition: all 0.3s ease-out;
+  overflow: hidden;
+}
+
+.story-header {
+  position: relative;
+  background: #1a202c;
+  border-radius: 6px;
+  padding: 1.2rem;
+  margin-bottom: 1.8rem;
+  transform-style: preserve-3d;
+  transform: translateZ(20px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+}
+
+.story-header::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: linear-gradient(45deg, #6b46c1, #805ad5);
+  border-radius: 6px;
+  transform: translateZ(-10px);
+  opacity: 0.6;
 }
 
 .story-result h2 {
-  margin-top: 0;
-  color: #4a5568;
-  margin-bottom: 1.5rem;
+  margin: 0;
+  color: #ffffff; /* White to match the decoded text */
   text-align: center;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  font-size: 1.4rem;
+  font-weight: 600;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
 }
 
 .story-content {
   margin-bottom: 2rem;
   line-height: 1.7;
-  color: #2d3748;
+  color: #ffffff; /* White for better readability on dark background */
+}
+
+/* Text Scramble/Decode Effect */
+.story-content p.typing {
+  color: #006400; /* Dark green */
+  font-weight: bold;
+  font-family: monospace, sans-serif;
+  transition: all 0.5s ease;
+  position: relative;
+}
+
+.story-content p.typing::before {
+  content: '';
+  position: absolute;
+  left: -5px;
+  top: 0;
+  height: 100%;
+  width: 3px;
+  background-color: #006400; /* Dark green cursor */
+  animation: cursor-blink 1s step-end infinite;
+}
+
+.story-content p.decoded {
+  color: #ffffff; /* White text */
+  font-size: 1.1em; /* Increased font size */
+  font-family: inherit;
+  transition: all 0.8s ease;
+  animation: fadeIn 0.8s ease forwards;
+}
+
+@keyframes cursor-blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0.8; }
+  to { opacity: 1; }
 }
 
 .loading-text {
-  color: #a0aec0;
+  color: #e2e8f0; /* Lighter color for better visibility on dark background */
   font-style: italic;
   text-align: center;
 }
 
 .audio-player {
   margin-top: 2rem;
-  border-top: 1px solid #e2e8f0;
+  border-top: 1px solid #4a5568; /* Darker border to match the dark theme */
   padding-top: 1.5rem;
 }
 
 .audio-player h3 {
   margin-top: 0;
-  color: #4a5568;
+  color: #ffffff; /* White text to match the theme */
   margin-bottom: 1rem;
   text-align: center;
 }

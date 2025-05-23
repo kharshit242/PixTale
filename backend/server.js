@@ -16,7 +16,7 @@ if (!process.env.GROQ_API_KEY) {
 
 // Initialize Express app
 const app = express();
-const PORT = process.env.PORT || 5173;
+const PORT = process.env.PORT || 3000;
 
 // Create uploads directory if it doesn't exist
 const uploadsDir = path.join(__dirname, 'uploads');
@@ -30,9 +30,22 @@ app.use(express.urlencoded({ extended: true }));
 
 // Enable CORS for frontend
 app.use(cors({
-  origin: process.env.ALLOWED_ORIGINS ? process.env.ALLOWED_ORIGINS.split(',') : 'http://localhost:5173', // Vite default dev server
-  methods: ['GET', 'POST'],
-  allowedHeaders: ['Content-Type']
+  origin: function(origin, callback) {
+    // Allow requests with no origin (like mobile apps, curl requests)
+    const allowedOrigins = process.env.ALLOWED_ORIGINS 
+      ? process.env.ALLOWED_ORIGINS.split(',') 
+      : ['http://localhost:5173', 'https://pixtale-app.vercel.app'];
+      
+    if (!origin || allowedOrigins.indexOf(origin) !== -1) {
+      callback(null, true);
+    } else {
+      console.log('CORS blocked origin:', origin);
+      callback(null, true); // During development, allow all origins
+    }
+  },
+  methods: ['GET', 'POST', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+  credentials: true // Allow cookies if needed later
 }));
 
 // Error handling middleware
@@ -64,7 +77,5 @@ app.get('/api/health', (req, res) => {
 
 // Start server
 app.listen(PORT, () => {
-  console.log(`PixTale API server running on port ${PORT}`);
-  console.log(`Uploads available at http://localhost:${PORT}/uploads/`);
-  console.log(`Health check at http://localhost:${PORT}/api/health`);
+  console.log(`Server running on port ${PORT}`);
 });

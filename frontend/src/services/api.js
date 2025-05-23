@@ -1,7 +1,7 @@
 // services/api.js
 import axios from 'axios';
 
-const API_BASE_URL = 'http://localhost:3000/api'; // 🔁 Update port here if needed
+const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || 'http://localhost:3000/api';
 
 const apiService = {
   generateStory: async (imageFile) => {
@@ -20,7 +20,8 @@ const apiService = {
       
       // If audioUrl is a relative path, convert it to an absolute URL
       if (data.audioUrl && data.audioUrl.startsWith('/')) {
-        data.audioUrl = `http://localhost:3000${data.audioUrl}`;
+        const baseUrl = API_BASE_URL.replace('/api', '');
+        data.audioUrl = `${baseUrl}${data.audioUrl}`;
       }
       
       console.log('Received data from API:', data);

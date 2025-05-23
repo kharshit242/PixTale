@@ -1,0 +1,14 @@
+services:
+  - type: web
+    name: pixtale-api
+    env: node
+    plan: free
+    buildCommand: npm install
+    startCommand: node server.js
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: GROQ_API_KEY
+        sync: false
+      - key: ALLOWED_ORIGINS
+        value: https://pixtale-app.vercel.app

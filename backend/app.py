@@ -22,7 +22,7 @@ uploads_dir = Path(__file__).parent / "uploads"
 uploads_dir.mkdir(exist_ok=True)
 
 # CORS configuration
-origins = os.getenv("ALLOWED_ORIGINS", "http://localhost:5173,https://pixtale-app.vercel.app").split(",")
+origins = os.getenv("ALLOWED_ORIGINS", "http://localhost:5173,https://pixtale-teal.vercel.app").split(",")
 app.add_middleware(
     CORSMiddleware,
     allow_origins=origins,

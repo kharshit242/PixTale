@@ -19,30 +19,20 @@ UPLOAD_DIR = BACKEND_DIR / 'uploads'
 def image_to_base64(image_path_str: str, max_dimension: int = 800, quality: int = 85) -> str:
     """
     Reads an image file, optimizes it to reduce token size, and converts it to base64 data URI format.
-    
-    Args:
-        image_path_str: Path to the image file
-        max_dimension: Maximum width or height of the image (default: 800px)
-        quality: JPEG compression quality for optimized images (default: 85)
     """
     try:
         image_path = Path(image_path_str)
         if not image_path.is_file():
             raise FileNotFoundError(f'Image file not found: {image_path_str}')
         
-        # Get original file size for comparison
         original_size = image_path.stat().st_size / 1024  # KB
         print(f'Original image size: {original_size:.2f} KB')
         
-        # Open and resize the image to reduce token count
         with Image.open(image_path) as img:
-            # Get original dimensions and format
             original_width, original_height = img.size
             print(f'Original dimensions: {original_width}x{original_height}')
             
-            # Convert to RGB if needed (remove alpha channel)
             if img.mode in ('RGBA', 'LA') or (img.mode == 'P' and 'transparency' in img.info):
-                # Need to convert to RGBA first to preserve alpha during conversion
                 alpha = img.convert('RGBA').split()[3]
                 bg = Image.new('RGBA', img.size, (255, 255, 255, 255))
                 bg.paste(img, mask=alpha)
@@ -50,7 +40,6 @@ def image_to_base64(image_path_str: str, max_dimension: int = 800, quality: int 
             elif img.mode != 'RGB':
                 img = img.convert('RGB')
             
-            # Resize if the image is too large (preserve aspect ratio)
             if original_width > max_dimension or original_height > max_dimension:
                 if original_width > original_height:
                     new_width = max_dimension
@@ -62,19 +51,16 @@ def image_to_base64(image_path_str: str, max_dimension: int = 800, quality: int 
                 img = img.resize((new_width, new_height), Image.LANCZOS)
                 print(f'Resized to: {new_width}x{new_height}')
             
-            # Save as optimized JPEG to byte array
             img_byte_arr = io.BytesIO()
             img.save(img_byte_arr, format='JPEG', quality=quality, optimize=True)
             img_byte_arr.seek(0)
             image_data = img_byte_arr.getvalue()
             
-            # Get optimized size
             optimized_size = len(image_data) / 1024  # KB
             print(f'Optimized image size: {optimized_size:.2f} KB (reduced by {(1 - optimized_size/original_size) * 100:.1f}%)')
             
-            # Convert to base64
             base64_encoded_data = base64.b64encode(image_data).decode('utf-8')
-            mime_type = 'image/jpeg'  # We're always converting to JPEG
+            mime_type = 'image/jpeg'
             
             base64_size = len(base64_encoded_data) / 1024  # KB
             print(f'Base64 string size: {base64_size:.2f} KB')
@@ -86,7 +72,7 @@ def image_to_base64(image_path_str: str, max_dimension: int = 800, quality: int 
 
 def generate_story_from_image(image_path_str: str) -> str:
     """
-    Generates a story based on an image using LangChain and Google Gemini model.
+    Generates a story based on an image using LangChain and Google Gemini Vision model.
     """
     load_dotenv(dotenv_path=ENV_PATH)
     google_api_key = os.getenv('GOOGLE_API_KEY')
@@ -96,46 +82,46 @@ def generate_story_from_image(image_path_str: str) -> str:
         raise ValueError('Missing GOOGLE_API_KEY. Please add it to your .env file in the backend directory.')
         
     try:
-        # Use optimized image processing to reduce token count
-        # Smaller dimensions = smaller base64 = fewer tokens
         base64_image = image_to_base64(image_path_str, max_dimension=600, quality=80)
         print(f'Successfully converted image to base64: {image_path_str}')
         
-        # Check base64 string size as a proxy for token count
         base64_size_kb = len(base64_image) / 1024
         print(f'Base64 image size: {base64_size_kb:.2f} KB')
         
-        # Warn if the image might still be too large
-        if base64_size_kb > 500:  # ~500KB can be concerning for token limits
+        if base64_size_kb > 500:
             print(f'WARNING: Image base64 size is quite large ({base64_size_kb:.2f} KB). This may exceed token limits.')
 
-        # Initialize the LangChain model with Google Gemini configuration
+        # Updated model to gemini-pro-vision for image support
         model = init_chat_model(
-            'gemini-2.0-flash-001',
+            'gemini-pro-vision',
             model_provider='google_genai',
             temperature=0.7,
-            max_output_tokens=32768
+            max_output_tokens=1024
         )
-        print('Initialized LangChain model with init_chat_model and Google Gemini provider')
+        print('Initialized LangChain model with Gemini Vision')
 
         system_prompt_text = (
            "You are a creative storyteller that creates imaginative, engaging, and family-friendly short stories "
             "(around 100-300 words) based on images. Create a whimsical, positive narrative that captures the "
             "essence of the image. Your stories should have a clear beginning, middle, and end, with vivid "
-            "descriptions. Avoid any adult, violent, political, or controversial themes. Keep story not more than 100 words."        )
+            "descriptions. Avoid any adult, violent, political, or controversial themes. Keep story not more than 100 words."
+        )
 
-        human_prompt_text = f'Generate a creative short story based on this image: {base64_image}'
+        # Extract only the base64 payload from the full data URI
+        base64_payload = base64_image.split(',')[1]
 
         messages = [
             SystemMessage(content=system_prompt_text),
-            HumanMessage(content=human_prompt_text)
+            HumanMessage(content=[
+                {"type": "text", "text": "Generate a creative short story based on this image:"},
+                {"type": "image_url", "image_url": {"url": f"data:image/jpeg;base64,{base64_payload}"}}
+            ])
         ]
 
-        print('Making API call to Google Gemini for story generation...')
+        print('Making API call to Google Gemini Vision for story generation...')
         response = model.invoke(messages)
-        print('Successfully received response from Google Gemini API.')
+        print('Successfully received response from Google Gemini Vision API.')
         
-        # Clean up memory - important for Render deployment with limited resources
         del base64_image
         del messages
         

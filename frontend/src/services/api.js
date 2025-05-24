@@ -6,7 +6,8 @@ const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000
 const apiService = {
   generateStory: async (imageFile) => {
     const formData = new FormData();
-    formData.append('image', imageFile);
+    formData.append('file', imageFile);
+
 
     try {
       const response = await axios.post(`${API_BASE_URL}/generate`, formData, {

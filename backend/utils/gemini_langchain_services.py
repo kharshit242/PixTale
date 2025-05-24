@@ -102,7 +102,7 @@ def generate_story_from_image(image_path_str: str) -> str:
 
         system_prompt_text = (
            "You are a creative storyteller that creates imaginative, engaging, and family-friendly short stories "
-            "(around 100-300 words) based on images. Create a whimsical, positive narrative that captures the "
+            "(around 300 words) based on images. Create a whimsical, positive narrative that captures the "
             "essence of the image. Your stories should have a clear beginning, middle, and end, with vivid "
             "descriptions. Avoid any adult, violent, political, or controversial themes. Keep story not more than 100 words."
         )

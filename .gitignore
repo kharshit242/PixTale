@@ -69,3 +69,13 @@ tmp/
 .history/
 .vercel
 .netlify
+
+# Python-specific ignores
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.env
+*.venv
+*.egg-info/
+*.pytest_cache/

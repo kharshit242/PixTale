@@ -1,14 +1,12 @@
 services:
   - type: web
     name: pixtale-api
-    env: node
+    env: python
     plan: free
-    buildCommand: npm install
-    startCommand: node server.js
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn app:app --host 0.0.0.0 --port 3000
     envVars:
-      - key: NODE_ENV
-        value: production
-      - key: GROQ_API_KEY
+      - key: NVIDIA_API_KEY
         sync: false
       - key: ALLOWED_ORIGINS
         value: https://pixtale-app.vercel.app

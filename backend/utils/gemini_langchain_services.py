@@ -93,7 +93,7 @@ def generate_story_from_image(image_path_str: str) -> str:
 
         # Updated model to gemini-pro-vision for image support
         model = init_chat_model(
-            'gemini-pro-vision',
+            'Gemini 2.0 Flash',
             model_provider='google_genai',
             temperature=0.7,
             max_output_tokens=1024

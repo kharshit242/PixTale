@@ -10,8 +10,8 @@ from dotenv import load_dotenv
 load_dotenv()
 
 # Verify required environment variables
-if not os.getenv("NVIDIA_API_KEY"):
-    print("NVIDIA_API_KEY is not set in environment variables")
+if not os.getenv("GOOGLE_API_KEY"):
+    print("GOOGLE_API_KEY is not set in environment variables")
     print("Please add it to your .env file and restart the server")
 
 # Initialize FastAPI app

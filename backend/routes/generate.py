@@ -4,8 +4,8 @@ from pathlib import Path
 import time
 import os
 
-# Import our existing story generation service
-from utils.nvidia_langchain_services import generate_story_and_audio
+# Import our story generation service
+from utils.gemini_langchain_services import generate_story_and_audio
 
 router = APIRouter()
 

@@ -8,6 +8,7 @@ from langchain_core.messages import SystemMessage, HumanMessage
 from gtts import gTTS
 import time
 from PIL import Image, ImageDraw
+from langchain_core.utils.token_length import get_token_length
 
 # Determine the project's backend root directory for loading .env and saving uploads
 # Assumes this script is in backend/utils/
@@ -28,7 +29,6 @@ def image_to_base64(image_path_str: str) -> str:
 
         mime_type, _ = mimetypes.guess_type(image_path)
         if mime_type is None:
-            # Fallback for common types if mimetypes fails (e.g., on some minimal OS installs)
             ext = image_path.suffix.lower()
             if ext == ".png":
                 mime_type = "image/png"
@@ -62,7 +62,7 @@ def generate_story_from_image(image_path_str: str) -> str:
             "mistralai/mistral-medium-3-instruct",
             model_provider="nvidia",
             temperature=0.7,
-             max_tokens=32768
+            max_output_tokens=32768  
         )
         print("Initialized LangChain model with init_chat_model and NVIDIA provider")
 
@@ -70,7 +70,7 @@ def generate_story_from_image(image_path_str: str) -> str:
             "Generate a story of no more than 300 words that is entirely based on the objects, settings, characters, and actions visible in the image.  "
             "The story can embrace any theme—such as adventure, mystery, romance, or slice of life—that naturally fits the image."
             " Ensure the narrative has a clear beginning, middle, and end, all derived from the image."
-            " Do not include any elements, characters, or actions not present in the image. " \
+            " Do not include any elements, characters, or actions not present in the image. "
             "Focus solely on what is visible to craft a complete and engaging story."
         )
 
@@ -97,9 +97,9 @@ def generate_audio_from_text(text: str) -> str:
     """
     try:
         print("Initializing gTTS for text-to-speech conversion...")
-        UPLOAD_DIR.mkdir(parents=True, exist_ok=True) # Ensure upload directory exists
+        UPLOAD_DIR.mkdir(parents=True, exist_ok=True)
         
-        timestamp = int(time.time() * 1000) # Milliseconds timestamp like JS Date.now()
+        timestamp = int(time.time() * 1000)
         audio_file_name = f"story-{timestamp}.mp3"
         audio_file_path = UPLOAD_DIR / audio_file_name
 
@@ -107,8 +107,6 @@ def generate_audio_from_text(text: str) -> str:
         gtts_obj.save(str(audio_file_path))
         
         print(f"Audio file saved successfully: {audio_file_path}")
-        # Return the path relative to the backend directory or an absolute path as needed by the caller
-        # For consistency with potential Node.js callers, returning an absolute path string.
         return str(audio_file_path.resolve())
     except Exception as e:
         print(f"Error generating audio from text using gTTS: {e}")
@@ -124,11 +122,10 @@ def generate_story_and_audio(image_path_str: str) -> dict:
         
         return {
             "story": story,
-            "audioPath": audio_path # Consistent with JS key
+            "audioPath": audio_path
         }
     except Exception as e:
         print(f"Error in generate_story_and_audio: {e}")
-        # It's useful to return or log more context if needed
         raise ValueError(f"Failed to generate story and audio for {image_path_str}: {e}")
 
 if __name__ == "__main__":
@@ -136,7 +133,6 @@ if __name__ == "__main__":
     if not ENV_PATH.exists():
         print(f"Warning: .env file not found at {ENV_PATH}. Make sure it exists and NVIDIA_API_KEY is set.")
 
-    # Create a dummy image for testing if none exists
     dummy_image_path = UPLOAD_DIR / "test_dummy_image.png"
     if not dummy_image_path.exists():
         try:
@@ -165,4 +161,3 @@ if __name__ == "__main__":
             print(f"An error occurred during the test run: {e}")
     else:
         print("Please set a valid test_image_path in the script or ensure Pillow can create one.")
-

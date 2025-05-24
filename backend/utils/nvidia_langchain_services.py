@@ -62,6 +62,7 @@ def generate_story_from_image(image_path_str: str) -> str:
             "mistralai/mistral-medium-3-instruct",
             model_provider="nvidia",
             temperature=0.7
+             max_tokens=32768
         )
         print("Initialized LangChain model with init_chat_model and NVIDIA provider")
 

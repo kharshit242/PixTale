@@ -119,11 +119,7 @@ def generate_story_from_image(image_path_str: str) -> str:
         print('Initialized LangChain model with init_chat_model and NVIDIA provider')
 
         system_prompt_text = (
-            'Generate a story of no more than 300 words that is entirely based on the objects, settings, characters, and actions visible in the image.  '
-            'The story can embrace any theme—such as adventure, mystery, romance, or slice of life—that naturally fits the image.'
-            ' Ensure the narrative has a clear beginning, middle, and end, all derived from the image.'
-            ' Do not include any elements, characters, or actions not present in the image. '
-            'Focus solely on what is visible to craft a complete and engaging story.'
+            "Create a story of no more than 300 words that is entirely derived from the objects, settings, characters, and actions visible in the provided image. Ensure every visible element in the image is incorporated and interconnected within the narrative, with no elements left unaddressed. The story must not introduce any details, characters, or actions not present in the image. Choose any theme—such as adventure, mystery, romance, or slice of life—that aligns with the image’s content. Craft a cohesive narrative with a clear beginning, middle, and end, where all image elements are meaningfully linked to form an engaging, self-contained story."
         )
 
         human_prompt_text = f'Generate a creative short story based on this image: {base64_image}'
